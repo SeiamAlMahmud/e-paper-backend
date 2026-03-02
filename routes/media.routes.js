@@ -3,6 +3,7 @@ const router = express.Router();
 const connectDB = require('../config/db');
 const fs = require('fs').promises;
 const path = require('path');
+const { getUploadDir } = require('../utils/storage');
 
 /**
  * GET /api/media - List media files
@@ -11,7 +12,7 @@ router.get('/', async (req, res) => {
     try {
         const { type = 'all', page = 1, limit = 20 } = req.query;
 
-        const uploadsDir = path.join(process.cwd(), '../public/uploads');
+        const uploadsDir = getUploadDir();
         const subdirs = ['pages', 'thumbnails', 'articles', 'site', 'profiles'];
 
         const files = [];

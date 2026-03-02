@@ -6,6 +6,7 @@ const Page = require('../models/page.model');
 const { generatePDFFromImage, mergePDFs } = require('../utils/pdf');
 const fs = require('fs').promises;
 const path = require('path');
+const { getUploadDir, resolveUploadUrlToPath } = require('../utils/storage');
 
 /**
  * GET /api/download/edition/:id - Download full edition as PDF
@@ -30,14 +31,14 @@ router.get('/edition/:id', async (req, res) => {
             });
         }
 
-        const pdfDir = path.join(process.cwd(), '../public/uploads/pdfs');
+        const pdfDir = getUploadDir('pdfs');
         await fs.mkdir(pdfDir, { recursive: true });
 
         const pdfPaths = [];
 
         // Generate PDF for each page
         for (const page of edition.pages) {
-            const imagePath = path.join(process.cwd(), '../public', page.imageUrl);
+            const imagePath = resolveUploadUrlToPath(page.imageUrl);
             const pdfPath = path.join(pdfDir, `temp-page-${page._id}.pdf`);
             await generatePDFFromImage(imagePath, pdfPath);
             pdfPaths.push(pdfPath);
@@ -86,8 +87,8 @@ router.get('/page/:id', async (req, res) => {
             });
         }
 
-        const imagePath = path.join(process.cwd(), '../public', page.imageUrl);
-        const pdfDir = path.join(process.cwd(), '../public/uploads/pdfs');
+        const imagePath = resolveUploadUrlToPath(page.imageUrl);
+        const pdfDir = getUploadDir('pdfs');
         await fs.mkdir(pdfDir, { recursive: true });
 
         const pdfFileName = `page-${page._id}-${Date.now()}.pdf`;

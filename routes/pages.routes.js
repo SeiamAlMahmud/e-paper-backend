@@ -6,6 +6,7 @@ const Page = require('../models/page.model');
 const { optimizeImage, generateThumbnail } = require('../utils/image');
 const { authenticate } = require('../middleware/auth');
 const { uploadSingle } = require('../middleware/upload');
+const { getUploadDir, toUploadUrl, resolveUploadUrlToPath } = require('../utils/storage');
 const fs = require('fs').promises;
 const path = require('path');
 
@@ -49,7 +50,7 @@ router.post('/', authenticate, uploadSingle.single('image'), async (req, res) =>
         const buffer = imageFile.buffer;
         const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
         const tempImageFilename = `temp-${uniqueSuffix}${path.extname(imageFile.originalname)}`;
-        const uploadDir = path.join(process.cwd(), '../public/uploads/pages');
+        const uploadDir = getUploadDir('pages');
         const tempImagePath = path.join(uploadDir, tempImageFilename);
 
         // Ensure directory exists
@@ -63,7 +64,7 @@ router.post('/', authenticate, uploadSingle.single('image'), async (req, res) =>
 
         // Generate thumbnail
         const thumbnailFilename = `thumb-${uniqueSuffix}.webp`;
-        const thumbnailDir = path.join(process.cwd(), '../public/uploads/thumbnails');
+        const thumbnailDir = getUploadDir('thumbnails');
         await fs.mkdir(thumbnailDir, { recursive: true });
         const thumbnailPath = path.join(thumbnailDir, thumbnailFilename);
         await generateThumbnail(finalPath, thumbnailPath, 300);
@@ -75,8 +76,8 @@ router.post('/', authenticate, uploadSingle.single('image'), async (req, res) =>
         const page = await Page.create({
             editionId,
             pageNumber: parseInt(pageNumber),
-            imageUrl: `/uploads/pages/${finalFilename}`,
-            thumbnailUrl: `/uploads/thumbnails/${thumbnailFilename}`,
+            imageUrl: toUploadUrl('pages', finalFilename),
+            thumbnailUrl: toUploadUrl('thumbnails', thumbnailFilename),
             articles: [],
         });
 
@@ -156,8 +157,8 @@ router.delete('/:id', authenticate, async (req, res) => {
         }
 
         // Delete image files
-        const imagePath = path.join(process.cwd(), '../public', page.imageUrl);
-        const thumbnailPath = path.join(process.cwd(), '../public', page.thumbnailUrl);
+        const imagePath = resolveUploadUrlToPath(page.imageUrl);
+        const thumbnailPath = resolveUploadUrlToPath(page.thumbnailUrl);
         await fs.unlink(imagePath).catch(() => { });
         await fs.unlink(thumbnailPath).catch(() => { });
 

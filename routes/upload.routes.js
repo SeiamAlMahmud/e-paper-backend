@@ -3,6 +3,7 @@ const router = express.Router();
 const { authenticate, hasPermission } = require('../middleware/auth');
 const { uploadSingle } = require('../middleware/upload');
 const { optimizeImage } = require('../utils/image');
+const { getUploadDir, toUploadUrl } = require('../utils/storage');
 const fs = require('fs').promises;
 const path = require('path');
 
@@ -56,7 +57,7 @@ router.post('/', authenticate, uploadSingle.single('file'), async (req, res) => 
         if (type === 'logo' || type === 'favicon') subDir = 'site';
         if (type === 'profile') subDir = 'profiles';
 
-        const uploadDir = path.join(process.cwd(), '../public/uploads', subDir);
+        const uploadDir = getUploadDir(subDir);
 
         // Ensure directory exists
         await fs.mkdir(uploadDir, { recursive: true });
@@ -71,14 +72,14 @@ router.post('/', authenticate, uploadSingle.single('file'), async (req, res) => 
 
         let finalFilename = `${uniqueSuffix}.webp`;
         let finalPath = path.join(uploadDir, finalFilename);
-        let fileUrl = `/uploads/${subDir}/${finalFilename}`;
+        let fileUrl = toUploadUrl(subDir, finalFilename);
 
         if (type === 'favicon' && extension === 'ico') {
             // Just move the temp to final
             finalFilename = `${uniqueSuffix}.ico`;
             finalPath = path.join(uploadDir, finalFilename);
             await fs.writeFile(finalPath, buffer);
-            fileUrl = `/uploads/${subDir}/${finalFilename}`;
+            fileUrl = toUploadUrl(subDir, finalFilename);
         } else {
             // Optimize and convert to WebP
             await optimizeImage(tempPath, finalPath, 95);

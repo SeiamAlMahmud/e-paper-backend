@@ -5,8 +5,8 @@ const { authenticate, hasPermission } = require('../middleware/auth');
 const { hashPassword } = require('../utils/auth');
 const User = require('../models/user.model');
 const { uploadSingle } = require('../middleware/upload');
+const { getUploadDir, toUploadUrl } = require('../utils/storage');
 const fs = require('fs').promises;
-const path = require('path');
 
 /**
  * PUT /api/profile - Update user profile
@@ -31,13 +31,13 @@ router.put('/', authenticate, uploadSingle.single('image'), async (req, res) => 
             const buffer = req.file.buffer;
             const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
             const filename = `profile-${uniqueSuffix}.webp`;
-            const uploadDir = path.join(process.cwd(), '../public/uploads/profiles');
+            const uploadDir = getUploadDir('profiles');
 
             await fs.mkdir(uploadDir, { recursive: true });
             const filePath = path.join(uploadDir, filename);
             await fs.writeFile(filePath, buffer);
 
-            updates.image = `/uploads/profiles/${filename}`;
+            updates.image = toUploadUrl('profiles', filename);
         } else if (req.body.image) {
             // Image URL provided (already uploaded via /api/upload)
             updates.image = req.body.image;

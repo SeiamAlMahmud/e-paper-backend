@@ -1,27 +1,33 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { getUploadDir } = require('../utils/storage');
 
 // Ensure upload directories exist
 const uploadDirs = [
-    path.join(process.cwd(), '../public/uploads/pages'),
-    path.join(process.cwd(), '../public/uploads/thumbnails'),
-    path.join(process.cwd(), '../public/uploads/pdfs'),
-    path.join(process.cwd(), '../public/uploads/articles'),
-    path.join(process.cwd(), '../public/uploads/site'),
-    path.join(process.cwd(), '../public/uploads/profiles'),
+    getUploadDir('pages'),
+    getUploadDir('thumbnails'),
+    getUploadDir('pdfs'),
+    getUploadDir('articles'),
+    getUploadDir('site'),
+    getUploadDir('profiles'),
 ];
 
 uploadDirs.forEach((dir) => {
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
+    try {
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+        }
+    } catch (error) {
+        // Don't crash app startup in restricted environments (e.g. serverless).
+        console.warn(`Upload directory unavailable: ${dir}`, error.message);
     }
 });
 
 // Configure storage for page images
 const pageStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, path.join(process.cwd(), '../public/uploads/pages'));
+        cb(null, getUploadDir('pages'));
     },
     filename: (req, file, cb) => {
         const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
@@ -33,7 +39,7 @@ const pageStorage = multer.diskStorage({
 // Configure storage for thumbnails
 const thumbnailStorage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, path.join(process.cwd(), '../public/uploads/thumbnails'));
+        cb(null, getUploadDir('thumbnails'));
     },
     filename: (req, file, cb) => {
         const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;

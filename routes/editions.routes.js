@@ -5,8 +5,8 @@ const Edition = require('../models/edition.model');
 const Page = require('../models/page.model');
 const Article = require('../models/article.model');
 const { authenticate, hasRole, requireRole } = require('../middleware/auth');
+const { resolveUploadUrlToPath } = require('../utils/storage');
 const fs = require('fs').promises;
-const path = require('path');
 
 /**
  * GET /api/editions - List all editions with filters
@@ -235,7 +235,7 @@ router.delete('/:id', authenticate, async (req, res) => {
             if (article.images && article.images.length > 0) {
                 for (const imgUrl of article.images) {
                     try {
-                        const filePath = path.join(process.cwd(), '../public', imgUrl);
+                        const filePath = resolveUploadUrlToPath(imgUrl);
                         await fs.unlink(filePath).catch(() => { });
                     } catch (err) {
                         console.error(`Failed to delete article image: ${imgUrl}`, err);
@@ -252,7 +252,7 @@ router.delete('/:id', authenticate, async (req, res) => {
             for (const fileUrl of filesToDelete) {
                 if (fileUrl) {
                     try {
-                        const filePath = path.join(process.cwd(), '../public', fileUrl);
+                        const filePath = resolveUploadUrlToPath(fileUrl);
                         await fs.unlink(filePath).catch(() => { });
                     } catch (err) {
                         console.error(`Failed to delete page file: ${fileUrl}`, err);
