@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 30001;
 
 // Middleware
 // Parse allowed origins from environment variable (comma-separated)
-const allowedOrigins = ['http://localhost:30001', 'http://localhost:3000','https://epaper.varaniben.com'];
+const allowedOrigins = ['http://localhost:30001', 'http://localhost:3000','https://epaper.varaniben.com', 'https://e-paper-system.vercel.app'];
 // const allowedOrigins = process.env.FRONTEND_URL
 //     ? process.env.FRONTEND_URL.split(',').map(url => url.trim())
 //     : ['http://localhost:30001', 'http://localhost:30000'];
