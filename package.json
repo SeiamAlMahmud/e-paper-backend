@@ -1,0 +1,34 @@
+{
+  "name": "e-paper-backend",
+  "version": "1.0.0",
+  "description": "Express.js backend for e-paper system",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node index.js",
+    "start": "cross-env NODE_ENV=production node index.js"
+  },
+  "keywords": [
+    "express",
+    "backend",
+    "api",
+    "e-paper"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "cross-env": "^10.1.0",
+    "dotenv": "^16.6.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.3",
+    "mongoose": "^9.2.0",
+    "multer": "^2.0.2",
+    "pdf-lib": "^1.17.1",
+    "sharp": "^0.34.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  }
+}
