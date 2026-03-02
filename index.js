@@ -3,6 +3,8 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const connectDB = require('./config/db');
+const dns = require('dns');
+dns.setServers(['1.1.1.1']);
 
 const app = express();
 const PORT = process.env.PORT || 30001;

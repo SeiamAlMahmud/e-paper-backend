@@ -83,8 +83,6 @@ const ArticleSchema = new Schema(
 );
 
 // Indexes for efficient querying
-ArticleSchema.index({ editionId: 1 });
-ArticleSchema.index({ category: 1 });
 ArticleSchema.index({ startPage: 1 });
 ArticleSchema.index({ editionId: 1, category: 1 });
 

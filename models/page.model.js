@@ -40,6 +40,5 @@ const PageSchema = new Schema(
 
 // Compound index: one edition can't have duplicate page numbers
 PageSchema.index({ editionId: 1, pageNumber: 1 }, { unique: true });
-PageSchema.index({ editionId: 1 });
 
 module.exports = mongoose.models.Page || mongoose.model('Page', PageSchema);
